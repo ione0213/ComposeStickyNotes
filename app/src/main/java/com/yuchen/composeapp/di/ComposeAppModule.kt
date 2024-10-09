@@ -1,8 +1,8 @@
-package com.example.composeapp.di
+package com.yuchen.composeapp.di
 
-import com.example.composeapp.data.FakeNoteRepository
-import com.example.composeapp.data.NoteRepository
-import com.example.composeapp.viewmodel.BoardViewModel
+import com.yuchen.composeapp.data.FakeNoteRepository
+import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.viewmodel.BoardViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

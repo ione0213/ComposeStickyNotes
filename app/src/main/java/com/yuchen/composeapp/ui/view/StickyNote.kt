@@ -1,4 +1,4 @@
-package com.example.composeapp.ui.view
+package com.yuchen.composeapp.ui.view
 
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
@@ -15,10 +15,10 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.composeapp.model.Note
-import com.example.composeapp.model.Position
-import com.example.composeapp.model.YCColor
-import com.example.composeapp.ui.theme.ComposeAppTheme
+import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.Position
+import com.yuchen.composeapp.model.YCColor
+import com.yuchen.composeapp.ui.theme.ComposeAppTheme
 
 @Composable
 fun StickyNote(

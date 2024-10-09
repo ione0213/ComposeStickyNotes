@@ -1,4 +1,4 @@
-package com.example.composeapp.model
+package com.yuchen.composeapp.model
 
 data class YCColor(
     val color: Long

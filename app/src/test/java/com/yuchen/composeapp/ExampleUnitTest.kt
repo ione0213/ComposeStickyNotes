@@ -1,4 +1,4 @@
-package com.example.composeapp
+package com.yuchen.composeapp
 
 import org.junit.Test
 

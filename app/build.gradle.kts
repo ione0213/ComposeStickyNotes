@@ -1,14 +1,17 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.Companion.kotlinNpmResolutionManager
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
 }
 
 android {
-    namespace = "com.example.composeapp"
+    namespace = "com.yuchen.composeapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.composeapp"
+        applicationId = "com.yuchen.composeapp"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -70,4 +73,7 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.rxkotlin)
     implementation(libs.koin)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firestore)
+    implementation(libs.firebase.analytics)
 }

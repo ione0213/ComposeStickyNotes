@@ -1,4 +1,4 @@
-package com.example.composeapp.ui.theme
+package com.yuchen.composeapp.ui.theme
 
 import android.app.Activity
 import android.os.Build

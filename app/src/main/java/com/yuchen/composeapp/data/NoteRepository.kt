@@ -1,6 +1,6 @@
-package com.example.composeapp.data
+package com.yuchen.composeapp.data
 
-import com.example.composeapp.model.Note
+import com.yuchen.composeapp.model.Note
 import io.reactivex.rxjava3.core.Observable
 
 interface NoteRepository {

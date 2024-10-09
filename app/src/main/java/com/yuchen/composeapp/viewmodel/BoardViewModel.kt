@@ -1,9 +1,9 @@
-package com.example.composeapp.viewmodel
+package com.yuchen.composeapp.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.composeapp.data.NoteRepository
-import com.example.composeapp.model.Note
-import com.example.composeapp.model.Position
+import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.Position
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo

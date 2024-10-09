@@ -1,4 +1,4 @@
-package com.example.composeapp.model
+package com.yuchen.composeapp.model
 
 import java.util.UUID
 import kotlin.random.Random
