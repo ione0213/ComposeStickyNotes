@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rxjava3.subscribeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.composeapp.viewmodel.BoardViewModel
 
@@ -15,7 +16,13 @@ fun BoardView(boardViewModel: BoardViewModel) {
 
     Box(Modifier.fillMaxSize()) {
         notes.forEach { note ->
-            StickyNote(note)
+            StickyNote(
+                Modifier.align(Alignment.Center),
+                onPositionChanged = { position ->
+                    boardViewModel.moveNote(note.id, position)
+                },
+                note
+            )
         }
     }
 }

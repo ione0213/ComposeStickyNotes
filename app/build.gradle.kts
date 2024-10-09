@@ -68,5 +68,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.runtime.rxjava)
     implementation(libs.rxjava)
+    implementation(libs.rxkotlin)
     implementation(libs.koin)
 }

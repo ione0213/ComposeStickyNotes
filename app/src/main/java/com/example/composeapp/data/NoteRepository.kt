@@ -5,4 +5,6 @@ import io.reactivex.rxjava3.core.Observable
 
 interface NoteRepository {
     fun getAll(): Observable<List<Note>>
+
+    fun putNote(note: Note)
 }
