@@ -31,6 +31,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 runtime-rxjava = { group = "androidx.compose.runtime", name = "runtime-rxjava3" }
 rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava" }
 rxkotlin = { group = "io.reactivex.rxjava3", name = "rxkotlin", version = "3.0.0" }
+rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version = "3.0.0" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firestore = { group = "com.google.firebase", name = "firebase-firestore" }

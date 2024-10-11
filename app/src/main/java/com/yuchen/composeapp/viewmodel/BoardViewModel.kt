@@ -13,7 +13,7 @@ class BoardViewModel(private val noteRepository: NoteRepository) : ViewModel() {
     private val disposable = CompositeDisposable()
 
     // Reactive programing
-    val allNotes: Observable<List<Note>> = noteRepository.getAll()
+    val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
 
     fun moveNote(noteId: String, delta: Position) {
         Observable.just(Pair(noteId, delta))

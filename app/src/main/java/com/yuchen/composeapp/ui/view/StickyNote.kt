@@ -1,5 +1,6 @@
 package com.yuchen.composeapp.ui.view
 
+import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
@@ -9,11 +10,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
@@ -26,9 +29,23 @@ fun StickyNote(
     onPositionChanged: (Position) -> Unit,
     note: Note
 ) {
+    val offset by animateIntOffsetAsState(
+        targetValue = IntOffset(
+            note.position.x.toInt(),
+            note.position.y.toInt()
+        ),
+        label = ""
+    )
+
+    // User position.dp directly without transfer with density
+    // will moving too much.
+    val density = LocalDensity.current
+    val xDp = with(density) { note.position.x.toDp() }
+    val yDp = with(density) { note.position.y.toDp() }
+
     Surface(
         modifier
-            .offset(x = note.position.x.dp, y = note.position.y.dp)
+            .offset { offset }
             .size(108.dp),
         color = Color(note.color.color),
         shadowElevation = 8.dp,

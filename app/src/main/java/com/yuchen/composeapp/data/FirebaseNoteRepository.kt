@@ -5,12 +5,17 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.Optional
+import java.util.concurrent.TimeUnit
 
 class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
     private val firestore = firebaseFacade.getFirestore()
-    private val notesSubject = BehaviorSubject.createDefault(emptyList<Note>())
+    private val allNotesSubject = BehaviorSubject.createDefault(emptyList<Note>())
+    private val updateNoteSubject = BehaviorSubject.createDefault(Optional.empty<Note>())
 
     private val query = firestore.collection(COLLECTION_NAME).limit(100)
 
@@ -18,13 +23,35 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
         query.addSnapshotListener { result, _ ->
             result?.let { onSnapshotUpdated(result) }
         }
+
+        updateNoteSubject
+            .throttleLast(300, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { optNote ->
+                optNote.ifPresent { setNoteDocument(it) }
+            }
+
+        updateNoteSubject
+            .filter { it.isPresent }
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .subscribe {
+                updateNoteSubject.onNext(Optional.empty<Note>())
+            }
     }
 
-    override fun getAll(): Observable<List<Note>> = notesSubject.hide()
+    override fun getAllNotes(): Observable<List<Note>> {
+        return Observables.combineLatest(updateNoteSubject, allNotesSubject)
+            .map { (optNote, allNotes) ->
+                optNote.map { note ->
+                    val noteIndex = allNotes.indexOfFirst { it.id == note.id }
+                    allNotes.subList(0, noteIndex) + note + allNotes.subList(noteIndex + 1, allNotes.size)
+                }.orElseGet { allNotes }
+            }
+    }
 
 
     override fun putNote(note: Note) {
-        setNoteDocument(note)
+        updateNoteSubject.onNext(Optional.of(note))
     }
 
     private fun setNoteDocument(note: Note) {
@@ -43,7 +70,7 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
             documentToNote(document)
         }
 
-        notesSubject.onNext(allNotes)
+        allNotesSubject.onNext(allNotes)
     }
 
     private fun documentToNote(document: QueryDocumentSnapshot): Note {

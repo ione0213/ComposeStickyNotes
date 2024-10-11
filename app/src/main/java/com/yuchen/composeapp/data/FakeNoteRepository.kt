@@ -15,7 +15,7 @@ class FakeNoteRepository: NoteRepository {
         noteSubject.onNext(notesMap.elements().toList())
     }
 
-    override fun getAll(): Observable<List<Note>> {
+    override fun getAllNotes(): Observable<List<Note>> {
         return noteSubject.hide()
     }
 

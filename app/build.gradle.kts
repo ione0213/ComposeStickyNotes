@@ -71,6 +71,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.runtime.rxjava)
     implementation(libs.rxjava)
+    implementation(libs.rxandroid)
     implementation(libs.rxkotlin)
     implementation(libs.koin)
     implementation(platform(libs.firebase.bom))
