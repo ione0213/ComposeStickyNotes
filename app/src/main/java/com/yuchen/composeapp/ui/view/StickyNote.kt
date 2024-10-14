@@ -1,6 +1,8 @@
 package com.yuchen.composeapp.ui.view
 
 import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
@@ -15,19 +17,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
-import com.yuchen.composeapp.model.YCColor
-import com.yuchen.composeapp.ui.theme.ComposeAppTheme
+
+private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
+    if (show) {
+        this.border(2.dp, Color.Black, MaterialTheme.shapes.medium)
+    } else {
+        this
+    }.padding(8.dp)
+}
 
 @Composable
 fun StickyNote(
     modifier: Modifier = Modifier,
+    note: Note,
+    selected: Boolean,
     onPositionChanged: (Position) -> Unit,
-    note: Note
+    onClick: (Note) -> Unit
 ) {
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(
@@ -46,11 +55,13 @@ fun StickyNote(
     Surface(
         modifier
             .offset { offset }
-            .size(108.dp),
+            .size(108.dp)
+            .highlightBorder(selected),
         color = Color(note.color.color),
         shadowElevation = 8.dp,
     ) {
         Column(modifier = Modifier
+            .clickable { onClick(note) }
             .pointerInput(note.id) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
@@ -65,20 +76,20 @@ fun StickyNote(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun StickyNotePreview() {
-    ComposeAppTheme {
-        StickyNote(
-            onPositionChanged = {},
-            note = Note(
-                id = "test",
-                text = "sticky note",
-                Position(0F, 0F),
-                YCColor(0xFFFF7EB9)
-            )
-        )
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun StickyNotePreview() {
+//    ComposeAppTheme {
+//        StickyNote(
+//            onPositionChanged = {},
+//            note = Note(
+//                id = "test",
+//                text = "sticky note",
+//                Position(0F, 0F),
+//                YCColor(0xFFFF7EB9)
+//            )
+//        )
+//    }
+//}
 

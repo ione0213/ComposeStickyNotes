@@ -44,14 +44,30 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
             .map { (optNote, allNotes) ->
                 optNote.map { note ->
                     val noteIndex = allNotes.indexOfFirst { it.id == note.id }
-                    allNotes.subList(0, noteIndex) + note + allNotes.subList(noteIndex + 1, allNotes.size)
+                    allNotes.subList(0, noteIndex) + note + allNotes.subList(
+                        noteIndex + 1,
+                        allNotes.size
+                    )
                 }.orElseGet { allNotes }
             }
     }
 
+    override fun getNoteById(id: String): Observable<Note> {
+        return allNotesSubject.map { notes ->
+            Optional.ofNullable(notes.find { note -> note.id == id })
+        }.mapOptional { it }
+    }
 
     override fun putNote(note: Note) {
         updateNoteSubject.onNext(Optional.of(note))
+    }
+
+    override fun createNote(note: Note) {
+        setNoteDocument(note)
+    }
+
+    override fun deleteNote(noteId: String) {
+        firestore.collection(COLLECTION_NAME).document(noteId).delete()
     }
 
     private fun setNoteDocument(note: Note) {

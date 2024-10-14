@@ -1,16 +1,15 @@
 package com.yuchen.composeapp.di
 
-import com.yuchen.composeapp.data.FakeNoteRepository
 import com.yuchen.composeapp.data.FirebaseFacade
 import com.yuchen.composeapp.data.FirebaseNoteRepository
 import com.yuchen.composeapp.data.NoteRepository
-import com.yuchen.composeapp.viewmodel.BoardViewModel
+import com.yuchen.composeapp.viewmodel.EditorViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 fun getModule() = module {
     viewModel {
-        BoardViewModel(get())
+        EditorViewModel(get())
     }
 
     single<NoteRepository> {

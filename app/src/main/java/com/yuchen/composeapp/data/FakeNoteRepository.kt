@@ -19,8 +19,20 @@ class FakeNoteRepository: NoteRepository {
         return noteSubject.hide()
     }
 
+    override fun getNoteById(id: String): Observable<Note> {
+        TODO()
+    }
+
     override fun putNote(note: Note) {
         notesMap[note.id] = note
         noteSubject.onNext(notesMap.elements().toList())
+    }
+
+    override fun createNote(note: Note) {
+        TODO()
+    }
+
+    override fun deleteNote(noteId: String) {
+        TODO()
     }
 }
