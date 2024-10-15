@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.R
 import com.yuchen.composeapp.data.FakeNoteRepository
 import com.yuchen.composeapp.model.YCColor
+import com.yuchen.composeapp.ui.state.EditorScreenState
 import com.yuchen.composeapp.ui.theme.ComposeAppTheme
 import com.yuchen.composeapp.ui.view.BoardView
 import com.yuchen.composeapp.ui.view.MenuView
@@ -39,19 +40,22 @@ fun EditorScreen(viewModel: EditorViewModel) {
                     detectTapGestures { viewModel.tapCanvas() }
                 }
         ) {
-            val selectedNote by viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
-            val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YCColor.Aquamarine)
-            val allNotes by viewModel.allNotes.subscribeAsState(initial = emptyList())
+            val editorScreenState by viewModel.editorScreenState.subscribeAsState(
+                initial = EditorScreenState(emptyList(), Optional.empty())
+            )
+//            val selectedNote by viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
+//            val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YCColor.Aquamarine)
+//            val allNotes by viewModel.allNotes.subscribeAsState(initial = emptyList())
 
             BoardView(
-                allNotes,
-                selectedNote,
+                editorScreenState.notes,
+                editorScreenState.selectedNote,
                 viewModel::moveNote,
                 viewModel::tapNote
             )
 
             AnimatedVisibility(
-                visible = !selectedNote.isPresent,
+                visible = editorScreenState.showAddButton,
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
                 FloatingActionButton(
@@ -65,11 +69,11 @@ fun EditorScreen(viewModel: EditorViewModel) {
             }
 
             AnimatedVisibility(
-                visible = selectedNote.isPresent,
+                visible = editorScreenState.showMenu,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 MenuView(
-                    selectedColor = selectingColor,
+                    selectedColor = editorScreenState.selectedColor.orElseGet { YCColor.Aquamarine },
                     onDeleteClicked = viewModel::deleteNote,
                     onTextClicked = viewModel::onEditTextClicked,
                     onColorSelected = viewModel::onColorSelected

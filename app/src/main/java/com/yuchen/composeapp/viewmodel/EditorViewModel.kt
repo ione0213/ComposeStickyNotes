@@ -5,6 +5,7 @@ import com.yuchen.composeapp.data.NoteRepository
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
+import com.yuchen.composeapp.ui.state.EditorScreenState
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.Observables
@@ -16,43 +17,24 @@ class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() 
     private val disposable = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
 
-    // Reactive programing
-    val allNotes: Observable<List<Note>> = noteRepository.getAllNotes()
-    val selectingNote: Observable<Optional<Note>> =
-        Observables.combineLatest(allNotes, selectingNoteIdSubject) { notes, id ->
-            Optional.ofNullable(notes.find { note -> note.id == id })
+    val editorScreenState: Observable<EditorScreenState>
+        get() = Observables.combineLatest(noteRepository.getAllNotes(), selectingNoteIdSubject) { notes, id ->
+            val selectedNote = Optional.ofNullable(notes.find { note -> note.id == id })
+            EditorScreenState(notes.toMutableList(), selectedNote)
         }.replay(1).autoConnect()
 
-    val selectingColor: Observable<YCColor> = selectingNote.mapOptional { it }.map { it.color }
-
     fun moveNote(noteId: String, delta: Position) {
-        Observable.just(Pair(noteId, delta))
-            .withLatestFrom(allNotes) { (noteId, delta), notes ->
-                val currentNote = notes.find { it.id == noteId }
+        editorScreenState.take(1)
+            .map { screenState ->
+                val currentNote = screenState.notes.find { it.id == noteId }
                 Optional.ofNullable(currentNote?.copy(position = currentNote.position + delta))
             }
             .mapOptional { it }
             .subscribe { newNote ->
                 noteRepository.putNote(newNote)
-            }.addTo(disposable)
+            }
+            .addTo(disposable)
     }
-
-    // Imperative programing
-//    private var allNotes = emptyList<Note>()
-//
-//    init {
-//        noteRepository.getAll()
-//            .subscribe { allNotes = it }
-//            .addTo(disposable)
-//    }
-//
-//    fun moveNote(id: String, position: Position) {
-//        val currentNote = allNotes.find { it.id == id }
-//        val newNote = currentNote?.copy(position = currentNote.position + position)
-//        newNote?.let {
-//            noteRepository.putNote(it)
-//        }
-//    }
 
     fun tapNote(note: Note) {
         val selectingNoteId = selectingNoteIdSubject.value
@@ -91,7 +73,8 @@ class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() 
     }
 
     private fun runOnSelectingNote(runner: (Note) -> Unit) {
-        selectingNote.take(1)
+        editorScreenState.take(1)
+            .map { it.selectedNote }
             .mapOptional { it }
             .subscribe(runner)
             .addTo(disposable)
