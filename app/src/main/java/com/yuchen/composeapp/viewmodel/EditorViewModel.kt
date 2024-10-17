@@ -11,17 +11,20 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Optional
 
 class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() {
     private val disposable = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
+    private val openEditTextSubject = PublishSubject.create<Note>()
 
     val editorScreenState: Observable<EditorScreenState>
         get() = Observables.combineLatest(noteRepository.getAllNotes(), selectingNoteIdSubject) { notes, id ->
             val selectedNote = Optional.ofNullable(notes.find { note -> note.id == id })
             EditorScreenState(notes.toMutableList(), selectedNote)
         }.replay(1).autoConnect()
+    val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
 
     fun moveNote(noteId: String, delta: Position) {
         editorScreenState.take(1)
@@ -62,7 +65,9 @@ class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() 
     }
 
     fun onEditTextClicked() {
-        TODO()
+        runOnSelectingNote { note ->
+            openEditTextSubject.onNext(note)
+        }
     }
 
     fun onColorSelected(color: YCColor) {

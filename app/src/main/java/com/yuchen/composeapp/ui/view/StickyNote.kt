@@ -48,9 +48,9 @@ fun StickyNote(
 
     // User position.dp directly without transfer with density
     // will moving too much.
-    val density = LocalDensity.current
-    val xDp = with(density) { note.position.x.toDp() }
-    val yDp = with(density) { note.position.y.toDp() }
+//    val density = LocalDensity.current
+//    val xDp = with(density) { note.position.x.toDp() }
+//    val yDp = with(density) { note.position.y.toDp() }
 
     Surface(
         modifier

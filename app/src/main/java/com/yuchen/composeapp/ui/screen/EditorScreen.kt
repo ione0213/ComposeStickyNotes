@@ -22,16 +22,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.R
 import com.yuchen.composeapp.data.FakeNoteRepository
+import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.YCColor
 import com.yuchen.composeapp.ui.state.EditorScreenState
 import com.yuchen.composeapp.ui.theme.ComposeAppTheme
 import com.yuchen.composeapp.ui.view.BoardView
 import com.yuchen.composeapp.ui.view.MenuView
+import com.yuchen.composeapp.utils.subscribeBy
+import com.yuchen.composeapp.utils.toMain
 import com.yuchen.composeapp.viewmodel.EditorViewModel
 import java.util.Optional
 
 @Composable
-fun EditorScreen(viewModel: EditorViewModel) {
+fun EditorScreen(
+    viewModel: EditorViewModel,
+    openEditTextScreen: (Note) -> Unit
+) {
+    viewModel.openEditTextScreen
+        .toMain()
+        .subscribeBy(onNext = openEditTextScreen)
+
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(
             Modifier
@@ -87,6 +97,6 @@ fun EditorScreen(viewModel: EditorViewModel) {
 @Composable
 fun EditorScreenPreview() {
     ComposeAppTheme {
-        EditorScreen(EditorViewModel(FakeNoteRepository()))
+        EditorScreen(EditorViewModel(FakeNoteRepository())) {}
     }
 }
