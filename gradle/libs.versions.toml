@@ -13,6 +13,7 @@ koin = "4.0.0"
 firebaseBom = "33.2.0"
 googlleServie = "4.4.2"
 navigationCompose = "2.8.2"
+mockk = "1.13.13"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

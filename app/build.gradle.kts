@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.Packaging
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.Companion.kotlinNpmResolutionManager
 
 plugins {
@@ -48,6 +49,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE-notice.md"
+            excludes += "/META-INF/LICENSE.md"
         }
     }
 }
@@ -78,4 +81,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firestore)
     implementation(libs.firebase.analytics)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
 }
