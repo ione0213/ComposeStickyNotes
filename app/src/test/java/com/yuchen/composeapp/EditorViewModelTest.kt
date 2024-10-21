@@ -1,6 +1,7 @@
 package com.yuchen.composeapp
 
 import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.domain.usecase.MoveNoteUseCase
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
@@ -15,7 +16,8 @@ import java.util.Optional
 
 internal class EditorViewModelTest {
     private val noteRepository: NoteRepository = mockk<NoteRepository>(relaxed = true)
-    private val viewModel = EditorViewModel(noteRepository)
+    private val moveNoteUseCase = MoveNoteUseCase(noteRepository)
+    private val viewModel = EditorViewModel(noteRepository, moveNoteUseCase)
 
     private fun fakeNotes(): List<Note> {
         return listOf(
@@ -39,7 +41,9 @@ internal class EditorViewModelTest {
     fun `move note 1 with delta position (40, 40), expect noteRepository put Note with position (40, 40)`() {
         every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
 
-        viewModel.moveNote("1", Position(40f, 40f))
+        moveNoteUseCase.invoke("1", Position(40f, 40f))
+//        viewModel.moveNote("1", Position(40f, 40f))
+
         verify {
             noteRepository.putNote(Note("1", "text1", Position(40f, 40f), YCColor.Aquamarine))
         }
@@ -49,7 +53,8 @@ internal class EditorViewModelTest {
     fun `move note 3 with delta position (40, 40), expect noteRepository put Note with position (60, 60)`() {
         every { noteRepository.getAllNotes() } returns Observable.just(fakeNotes())
 
-        viewModel.moveNote("3", Position(40f, 40f))
+        moveNoteUseCase.invoke("3", Position(40f, 40f))
+//        viewModel.moveNote("3", Position(40f, 40f))
         verify {
             noteRepository.putNote(Note("3", "text3", Position(60f, 60f), YCColor.HotPink))
         }

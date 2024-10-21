@@ -2,6 +2,7 @@ package com.yuchen.composeapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.domain.usecase.MoveNoteUseCase
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
@@ -14,7 +15,10 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Optional
 
-class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() {
+class EditorViewModel(
+    private val noteRepository: NoteRepository,
+    private val moveNoteUseCase: MoveNoteUseCase
+) : ViewModel() {
     private val disposable = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
     private val openEditTextSubject = PublishSubject.create<Note>()
@@ -27,16 +31,17 @@ class EditorViewModel(private val noteRepository: NoteRepository) : ViewModel() 
     val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
 
     fun moveNote(noteId: String, delta: Position) {
-        editorScreenState.take(1)
-            .map { screenState ->
-                val currentNote = screenState.notes.find { it.id == noteId }
-                Optional.ofNullable(currentNote?.copy(position = currentNote.position + delta))
-            }
-            .mapOptional { it }
-            .subscribe { newNote ->
-                noteRepository.putNote(newNote)
-            }
-            .addTo(disposable)
+//        editorScreenState.take(1)
+//            .map { screenState ->
+//                val currentNote = screenState.notes.find { it.id == noteId }
+//                Optional.ofNullable(currentNote?.copy(position = currentNote.position + delta))
+//            }
+//            .mapOptional { it }
+//            .subscribe { newNote ->
+//                noteRepository.putNote(newNote)
+//            }
+//            .addTo(disposable)
+        moveNoteUseCase(noteId, delta).addTo(disposable)
     }
 
     fun tapNote(note: Note) {

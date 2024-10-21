@@ -31,6 +31,8 @@ import com.yuchen.composeapp.ui.view.MenuView
 import com.yuchen.composeapp.utils.subscribeBy
 import com.yuchen.composeapp.utils.toMain
 import com.yuchen.composeapp.viewmodel.EditorViewModel
+import org.koin.core.Koin
+import org.koin.java.KoinJavaComponent.getKoin
 import java.util.Optional
 
 @Composable
@@ -97,6 +99,6 @@ fun EditorScreen(
 @Composable
 fun EditorScreenPreview() {
     ComposeAppTheme {
-        EditorScreen(EditorViewModel(FakeNoteRepository())) {}
+        EditorScreen(EditorViewModel(FakeNoteRepository(), getKoin().get())) {}
     }
 }
