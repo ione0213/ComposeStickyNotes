@@ -26,10 +26,7 @@ class EditorViewModel(
     private val openEditTextSubject = PublishSubject.create<Note>()
 
     val editorScreenState: Observable<EditorScreenState>
-        get() = Observables.combineLatest(noteRepository.getAllNotes(), selectingNoteIdSubject) { notes, id ->
-            val selectedNote = Optional.ofNullable(notes.find { note -> note.id == id })
-            EditorScreenState(notes.toMutableList(), selectedNote)
-        }.replay(1).autoConnect()
+        get() = editor.editorScreenState
     val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
 
     init {
@@ -37,31 +34,15 @@ class EditorViewModel(
     }
 
     fun moveNote(noteId: String, delta: Position) {
-//        editorScreenState.take(1)
-//            .map { screenState ->
-//                val currentNote = screenState.notes.find { it.id == noteId }
-//                Optional.ofNullable(currentNote?.copy(position = currentNote.position + delta))
-//            }
-//            .mapOptional { it }
-//            .subscribe { newNote ->
-//                noteRepository.putNote(newNote)
-//            }
-//            .addTo(disposable)
-//        moveNoteUseCase(noteId, delta).addTo(disposable)
         editor.moveNote(noteId, delta)
     }
 
     fun tapNote(note: Note) {
-        val selectingNoteId = selectingNoteIdSubject.value
-        if (selectingNoteId == note.id) {
-            selectingNoteIdSubject.onNext("")
-        } else {
-            selectingNoteIdSubject.onNext(note.id)
-        }
+        editor.selectNote(note.id)
     }
 
     fun tapCanvas() {
-        selectingNoteIdSubject.onNext("")
+        editor.clearSelection()
     }
 
     fun addNewNote() {
