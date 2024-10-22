@@ -2,6 +2,7 @@ package com.yuchen.composeapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.domain.Editor
 import com.yuchen.composeapp.domain.usecase.MoveNoteUseCase
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.Position
@@ -17,7 +18,8 @@ import java.util.Optional
 
 class EditorViewModel(
     private val noteRepository: NoteRepository,
-    private val moveNoteUseCase: MoveNoteUseCase
+    private val moveNoteUseCase: MoveNoteUseCase,
+    private val editor: Editor
 ) : ViewModel() {
     private val disposable = CompositeDisposable()
     private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
@@ -30,6 +32,10 @@ class EditorViewModel(
         }.replay(1).autoConnect()
     val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
 
+    init {
+        editor.start()
+    }
+
     fun moveNote(noteId: String, delta: Position) {
 //        editorScreenState.take(1)
 //            .map { screenState ->
@@ -41,7 +47,8 @@ class EditorViewModel(
 //                noteRepository.putNote(newNote)
 //            }
 //            .addTo(disposable)
-        moveNoteUseCase(noteId, delta).addTo(disposable)
+//        moveNoteUseCase(noteId, delta).addTo(disposable)
+        editor.moveNote(noteId, delta)
     }
 
     fun tapNote(note: Note) {
@@ -58,8 +65,7 @@ class EditorViewModel(
     }
 
     fun addNewNote() {
-        val newNote = Note.createRandomNote()
-        noteRepository.createNote(newNote)
+        editor.addNote()
     }
 
     fun deleteNote() {
@@ -92,5 +98,6 @@ class EditorViewModel(
 
     override fun onCleared() {
         disposable.clear()
+        editor.stop()
     }
 }

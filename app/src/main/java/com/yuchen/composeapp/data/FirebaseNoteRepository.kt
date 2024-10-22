@@ -25,7 +25,7 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
         }
 
         updateNoteSubject
-            .throttleLast(300, TimeUnit.MILLISECONDS)
+            .throttleLast(1000, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { optNote ->
                 optNote.ifPresent { setNoteDocument(it) }
@@ -33,7 +33,7 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
 
         updateNoteSubject
             .filter { it.isPresent }
-            .debounce(300, TimeUnit.MILLISECONDS)
+            .debounce(1000, TimeUnit.MILLISECONDS)
             .subscribe {
                 updateNoteSubject.onNext(Optional.empty<Note>())
             }
@@ -53,9 +53,16 @@ class FirebaseNoteRepository(firebaseFacade: FirebaseFacade) : NoteRepository {
     }
 
     override fun getNoteById(id: String): Observable<Note> {
-        return allNotesSubject.map { notes ->
+        val remote = allNotesSubject.map { notes ->
             Optional.ofNullable(notes.find { note -> note.id == id })
         }.mapOptional { it }
+        return updateNoteSubject.switchMap { optNote ->
+            if (optNote.isPresent && optNote.get().id == id) {
+                remote.map { optNote.get() }
+            } else {
+                remote
+            }
+        }
     }
 
     override fun putNote(note: Note) {

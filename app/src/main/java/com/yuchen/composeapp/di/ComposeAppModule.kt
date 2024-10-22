@@ -3,6 +3,7 @@ package com.yuchen.composeapp.di
 import com.yuchen.composeapp.data.FirebaseFacade
 import com.yuchen.composeapp.data.FirebaseNoteRepository
 import com.yuchen.composeapp.data.NoteRepository
+import com.yuchen.composeapp.domain.Editor
 import com.yuchen.composeapp.domain.usecase.MoveNoteUseCase
 import com.yuchen.composeapp.viewmodel.EditTextViewModel
 import com.yuchen.composeapp.viewmodel.EditorViewModel
@@ -11,7 +12,7 @@ import org.koin.dsl.module
 
 fun getModule() = module {
     viewModel {
-        EditorViewModel(get(), get())
+        EditorViewModel(get(), get(), get())
     }
 
     viewModel { (noteId: String, defaultText: String) ->
@@ -31,5 +32,9 @@ fun getModule() = module {
 
     single {
         MoveNoteUseCase(get())
+    }
+
+    single {
+        Editor(get())
     }
 }
