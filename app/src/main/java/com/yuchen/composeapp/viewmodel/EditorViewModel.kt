@@ -16,18 +16,10 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Optional
 
-class EditorViewModel(
-    private val noteRepository: NoteRepository,
-    private val moveNoteUseCase: MoveNoteUseCase,
-    private val editor: Editor
-) : ViewModel() {
-    private val disposable = CompositeDisposable()
-    private val selectingNoteIdSubject = BehaviorSubject.createDefault("")
-    private val openEditTextSubject = PublishSubject.create<Note>()
-
+class EditorViewModel(private val editor: Editor) : ViewModel() {
     val editorScreenState: Observable<EditorScreenState>
         get() = editor.editorScreenState
-    val openEditTextScreen: Observable<Note> = openEditTextSubject.hide()
+    val openEditTextScreen: Observable<Note> = editor.openEditTextScreen
 
     init {
         editor.start()
@@ -50,35 +42,18 @@ class EditorViewModel(
     }
 
     fun deleteNote() {
-        runOnSelectingNote { note ->
-            noteRepository.deleteNote(note.id)
-            selectingNoteIdSubject.onNext("")
-        }
+        editor.contextMenu.onDeleteClicked()
     }
 
     fun onEditTextClicked() {
-        runOnSelectingNote { note ->
-            openEditTextSubject.onNext(note)
-        }
+        editor.contextMenu.onEditTextClicked()
     }
 
     fun onColorSelected(color: YCColor) {
-        runOnSelectingNote { note ->
-            val newNote = note.copy(color = color)
-            noteRepository.putNote(newNote)
-        }
-    }
-
-    private fun runOnSelectingNote(runner: (Note) -> Unit) {
-        editorScreenState.take(1)
-            .map { it.selectedNote }
-            .mapOptional { it }
-            .subscribe(runner)
-            .addTo(disposable)
+        editor.contextMenu.onColorSelected(color)
     }
 
     override fun onCleared() {
-        disposable.clear()
         editor.stop()
     }
 }

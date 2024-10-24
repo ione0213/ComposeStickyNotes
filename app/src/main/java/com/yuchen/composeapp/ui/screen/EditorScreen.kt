@@ -99,6 +99,6 @@ fun EditorScreen(
 @Composable
 fun EditorScreenPreview() {
     ComposeAppTheme {
-        EditorScreen(EditorViewModel(FakeNoteRepository(), getKoin().get(), getKoin().get())) {}
+        EditorScreen(EditorViewModel(getKoin().get())) {}
     }
 }

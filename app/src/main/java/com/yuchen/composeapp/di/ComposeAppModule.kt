@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 fun getModule() = module {
     viewModel {
-        EditorViewModel(get(), get(), get())
+        EditorViewModel(get())
     }
 
     viewModel { (noteId: String, defaultText: String) ->
