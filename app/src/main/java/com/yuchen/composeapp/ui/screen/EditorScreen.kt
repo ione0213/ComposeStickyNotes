@@ -21,17 +21,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.R
-import com.yuchen.composeapp.data.FakeNoteRepository
 import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.YCColor
 import com.yuchen.composeapp.ui.state.EditorScreenState
 import com.yuchen.composeapp.ui.theme.ComposeAppTheme
 import com.yuchen.composeapp.ui.view.BoardView
-import com.yuchen.composeapp.ui.view.MenuView
+import com.yuchen.composeapp.ui.view.ContextMenuView
+import com.yuchen.composeapp.ui.view.StatefulContextMenuView
 import com.yuchen.composeapp.utils.subscribeBy
 import com.yuchen.composeapp.utils.toMain
 import com.yuchen.composeapp.viewmodel.EditorViewModel
-import org.koin.core.Koin
 import org.koin.java.KoinJavaComponent.getKoin
 import java.util.Optional
 
@@ -84,12 +83,7 @@ fun EditorScreen(
                 visible = editorScreenState.showMenu,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                MenuView(
-                    selectedColor = editorScreenState.selectedColor.orElseGet { YCColor.Aquamarine },
-                    onDeleteClicked = viewModel::deleteNote,
-                    onTextClicked = viewModel::onEditTextClicked,
-                    onColorSelected = viewModel::onColorSelected
-                )
+                StatefulContextMenuView()
             }
         }
     }

@@ -1,12 +1,17 @@
 package com.yuchen.composeapp.domain
 
+import com.yuchen.composeapp.model.Note
 import com.yuchen.composeapp.model.YCColor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
+import java.util.Optional
 
-class ContextMenu {
-//    val colorOptions: List<String> = TODO()
-//    val selectedColor: Observable<YCColor> = TODO()
+class ContextMenu(
+    private val selectedNote: Observable<Optional<Note>>
+) {
+    val colorOptions: List<YCColor> = YCColor.defaultColors
+    val selectedColor: Observable<YCColor> = selectedNote.mapOptional { it }.map { it.color }
+
     private val _contextMenuEvent = PublishSubject.create<ContextMenuEvent>()
     val contextMenuEvent: Observable<ContextMenuEvent> = _contextMenuEvent.hide()
 
@@ -24,7 +29,7 @@ class ContextMenu {
 }
 
 sealed interface ContextMenuEvent {
-    data object NavigateToEditTextPage: ContextMenuEvent
-    data object DeleteNote: ContextMenuEvent
-    class ChangeColor(val color: YCColor): ContextMenuEvent
+    data object NavigateToEditTextPage : ContextMenuEvent
+    data object DeleteNote : ContextMenuEvent
+    class ChangeColor(val color: YCColor) : ContextMenuEvent
 }

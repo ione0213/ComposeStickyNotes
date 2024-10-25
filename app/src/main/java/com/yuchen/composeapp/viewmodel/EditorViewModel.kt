@@ -41,18 +41,6 @@ class EditorViewModel(private val editor: Editor) : ViewModel() {
         editor.addNote()
     }
 
-    fun deleteNote() {
-        editor.contextMenu.onDeleteClicked()
-    }
-
-    fun onEditTextClicked() {
-        editor.contextMenu.onEditTextClicked()
-    }
-
-    fun onColorSelected(color: YCColor) {
-        editor.contextMenu.onColorSelected(color)
-    }
-
     override fun onCleared() {
         editor.stop()
     }

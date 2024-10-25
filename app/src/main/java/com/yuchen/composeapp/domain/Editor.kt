@@ -37,7 +37,15 @@ class Editor(private val noteRepository: NoteRepository) {
         .withLatestFrom(editorScreenState) { _, state -> state.selectedNote }
         .mapOptional { it }
 
-    val contextMenu: ContextMenu = ContextMenu()
+    val contextMenu: ContextMenu = ContextMenu(
+        editorScreenState.map { state ->
+            if (state.selectedNote.isPresent) {
+                Optional.ofNullable(state.selectedNote.get())
+            } else {
+                Optional.empty()
+            }
+        }
+    )
 
     private val disposableBag = CompositeDisposable()
 
