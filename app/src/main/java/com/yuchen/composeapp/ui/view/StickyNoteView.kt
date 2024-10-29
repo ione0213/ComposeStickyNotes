@@ -13,14 +13,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.yuchen.composeapp.model.Note
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.model.Position
+import com.yuchen.composeapp.viewmodel.StickyNoteViewModel
+import org.koin.java.KoinJavaComponent.getKoin
 
 private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show ->
     if (show) {
@@ -31,12 +37,44 @@ private val highlightBorder: @Composable Modifier.(Boolean) -> Modifier = { show
 }
 
 @Composable
-fun StickyNote(
+fun StatefulStickyNoteView(
     modifier: Modifier = Modifier,
-    note: Note,
+    noteId: String
+) {
+    val viewModelStoreOwner = LocalViewModelStoreOwner.current ?: return
+    val viewModel: StickyNoteViewModel = viewModel(
+        viewModelStoreOwner,
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return StickyNoteViewModel(getKoin().get()) as T
+            }
+        }
+    )
+    val note by viewModel.getNoteById(noteId)
+        .subscribeAsState(initial = StickyNote.createEmptyNote(noteId))
+    val selected by viewModel.isSelected(noteId)
+        .subscribeAsState(initial = false)
+
+    val onPositionChanged: (Position) -> Unit = { delta ->
+        viewModel.moveNote(noteId, delta)
+    }
+
+    StickyNoteView(
+        modifier = modifier,
+        note = note,
+        selected = selected,
+        onPositionChanged = onPositionChanged,
+        onClick = viewModel::tapNote
+    )
+}
+
+@Composable
+fun StickyNoteView(
+    modifier: Modifier = Modifier,
+    note: StickyNote,
     selected: Boolean,
     onPositionChanged: (Position) -> Unit,
-    onClick: (Note) -> Unit
+    onClick: (StickyNote) -> Unit
 ) {
     val offset by animateIntOffsetAsState(
         targetValue = IntOffset(

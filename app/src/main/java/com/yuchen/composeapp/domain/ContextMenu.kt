@@ -1,13 +1,13 @@
 package com.yuchen.composeapp.domain
 
-import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.model.YCColor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Optional
 
 class ContextMenu(
-    private val selectedNote: Observable<Optional<Note>>
+    private val selectedNote: Observable<Optional<StickyNote>>
 ) {
     val colorOptions: List<YCColor> = YCColor.defaultColors
     val selectedColor: Observable<YCColor> = selectedNote.mapOptional { it }.map { it.color }

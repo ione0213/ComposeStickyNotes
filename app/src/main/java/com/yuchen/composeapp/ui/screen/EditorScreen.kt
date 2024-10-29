@@ -21,23 +21,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yuchen.composeapp.R
-import com.yuchen.composeapp.model.Note
-import com.yuchen.composeapp.model.YCColor
-import com.yuchen.composeapp.ui.state.EditorScreenState
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.ui.theme.ComposeAppTheme
-import com.yuchen.composeapp.ui.view.BoardView
-import com.yuchen.composeapp.ui.view.ContextMenuView
 import com.yuchen.composeapp.ui.view.StatefulContextMenuView
+import com.yuchen.composeapp.ui.view.ViewPort
 import com.yuchen.composeapp.utils.subscribeBy
 import com.yuchen.composeapp.utils.toMain
 import com.yuchen.composeapp.viewmodel.EditorViewModel
 import org.koin.java.KoinJavaComponent.getKoin
-import java.util.Optional
 
 @Composable
 fun EditorScreen(
     viewModel: EditorViewModel,
-    openEditTextScreen: (Note) -> Unit
+    openEditTextScreen: (StickyNote) -> Unit
 ) {
     viewModel.openEditTextScreen
         .toMain()
@@ -51,22 +47,14 @@ fun EditorScreen(
                     detectTapGestures { viewModel.tapCanvas() }
                 }
         ) {
-            val editorScreenState by viewModel.editorScreenState.subscribeAsState(
-                initial = EditorScreenState(emptyList(), Optional.empty())
-            )
-//            val selectedNote by viewModel.selectingNote.subscribeAsState(initial = Optional.empty())
-//            val selectingColor by viewModel.selectingColor.subscribeAsState(initial = YCColor.Aquamarine)
-//            val allNotes by viewModel.allNotes.subscribeAsState(initial = emptyList())
+            val showAddButton by viewModel.showAddButton.subscribeAsState(true)
+            val showContextMenu by viewModel.showContextMenu.subscribeAsState(false)
+            val noteIds by viewModel.allVisibleNoteIds.subscribeAsState(emptyList())
 
-            BoardView(
-                editorScreenState.notes,
-                editorScreenState.selectedNote,
-                viewModel::moveNote,
-                viewModel::tapNote
-            )
+            ViewPort(noteIds)
 
             AnimatedVisibility(
-                visible = editorScreenState.showAddButton,
+                visible = showAddButton,
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
                 FloatingActionButton(
@@ -80,7 +68,7 @@ fun EditorScreen(
             }
 
             AnimatedVisibility(
-                visible = editorScreenState.showMenu,
+                visible = showContextMenu,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 StatefulContextMenuView()

@@ -1,7 +1,7 @@
 package com.yuchen.composeapp
 
 import com.yuchen.composeapp.data.NoteRepository
-import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
 import com.yuchen.composeapp.viewmodel.EditTextViewModel
@@ -17,11 +17,11 @@ class EditTextViewModelTest {
     private val defaultText = "text1"
     private val viewModel = EditTextViewModel(noteRepository, noteId, defaultText)
 
-    private fun fakeNotes(): List<Note> {
+    private fun fakeNotes(): List<StickyNote> {
         return listOf(
-            Note("1", "text1", Position(0f, 0f), YCColor.Aquamarine),
-            Note("2", "text2", Position(10f, 10f), YCColor.Gorse),
-            Note("3", "text3", Position(20f, 20f), YCColor.HotPink)
+            StickyNote("1", "text1", Position(0f, 0f), YCColor.Aquamarine),
+            StickyNote("2", "text2", Position(10f, 10f), YCColor.Gorse),
+            StickyNote("3", "text3", Position(20f, 20f), YCColor.HotPink)
         )
     }
 

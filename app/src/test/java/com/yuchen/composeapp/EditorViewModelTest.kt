@@ -2,7 +2,7 @@ package com.yuchen.composeapp
 
 import com.yuchen.composeapp.data.NoteRepository
 import com.yuchen.composeapp.domain.usecase.MoveNoteUseCase
-import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
 import com.yuchen.composeapp.viewmodel.EditorViewModel
@@ -19,11 +19,11 @@ internal class EditorViewModelTest {
     private val moveNoteUseCase = MoveNoteUseCase(noteRepository)
     private val viewModel = EditorViewModel(noteRepository, moveNoteUseCase)
 
-    private fun fakeNotes(): List<Note> {
+    private fun fakeNotes(): List<StickyNote> {
         return listOf(
-            Note("1", "text1", Position(0f, 0f), YCColor.Aquamarine),
-            Note("2", "text2", Position(10f, 10f), YCColor.Gorse),
-            Note("3", "text3", Position(20f, 20f), YCColor.HotPink)
+            StickyNote("1", "text1", Position(0f, 0f), YCColor.Aquamarine),
+            StickyNote("2", "text2", Position(10f, 10f), YCColor.Gorse),
+            StickyNote("3", "text3", Position(20f, 20f), YCColor.HotPink)
         )
     }
 
@@ -33,7 +33,7 @@ internal class EditorViewModelTest {
 
         val editorScreenStateObserver = viewModel.editorScreenState.test()
         editorScreenStateObserver.assertValue { state ->
-            state.notes == fakeNotes()
+            state.noteIds == fakeNotes()
         }
     }
 
@@ -45,7 +45,7 @@ internal class EditorViewModelTest {
 //        viewModel.moveNote("1", Position(40f, 40f))
 
         verify {
-            noteRepository.putNote(Note("1", "text1", Position(40f, 40f), YCColor.Aquamarine))
+            noteRepository.putNote(StickyNote("1", "text1", Position(40f, 40f), YCColor.Aquamarine))
         }
     }
 
@@ -56,7 +56,7 @@ internal class EditorViewModelTest {
         moveNoteUseCase.invoke("3", Position(40f, 40f))
 //        viewModel.moveNote("3", Position(40f, 40f))
         verify {
-            noteRepository.putNote(Note("3", "text3", Position(60f, 60f), YCColor.HotPink))
+            noteRepository.putNote(StickyNote("3", "text3", Position(60f, 60f), YCColor.HotPink))
         }
     }
 
@@ -79,7 +79,7 @@ internal class EditorViewModelTest {
         viewModel.tapNote(tappedNote)
 
         editorScreenStateObserver.apply {
-            assertValueAt(0) { state -> state.selectedNote == Optional.empty<Note>() }
+            assertValueAt(0) { state -> state.selectedNote == Optional.empty<StickyNote>() }
             assertValueAt(1) { state -> state.selectedNote == Optional.of(tappedNote) }
         }
     }
@@ -96,7 +96,7 @@ internal class EditorViewModelTest {
             tapCanvas()
         }
 
-        editorScreenStateObserver.assertValueAt(2) { state -> state.selectedNote == Optional.empty<Note>() }
+        editorScreenStateObserver.assertValueAt(2) { state -> state.selectedNote == Optional.empty<StickyNote>() }
     }
 
     @Test
@@ -125,7 +125,7 @@ internal class EditorViewModelTest {
             deleteNote()
         }
 
-        editorScreenStateObserver.assertValueAt(2) { state -> state.selectedNote == Optional.empty<Note>() }
+        editorScreenStateObserver.assertValueAt(2) { state -> state.selectedNote == Optional.empty<StickyNote>() }
     }
 
 

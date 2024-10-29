@@ -1,34 +1,34 @@
 package com.yuchen.composeapp.data
 
-import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.StickyNote
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.ConcurrentHashMap
 
 class FakeNoteRepository: NoteRepository {
-    private val noteSubject = BehaviorSubject.create<List<Note>>()
-    private val notesMap = ConcurrentHashMap<String, Note>()
+    private val noteSubject = BehaviorSubject.create<List<StickyNote>>()
+    private val notesMap = ConcurrentHashMap<String, StickyNote>()
 
     init {
-        val initNote = Note.createRandomNote()
+        val initNote = StickyNote.createRandomNote()
         notesMap[initNote.id] = initNote
         noteSubject.onNext(notesMap.elements().toList())
     }
 
-    override fun getAllNotes(): Observable<List<Note>> {
-        return noteSubject.hide()
+    override fun getAllVisibleNoteIds(): Observable<List<String>> {
+        TODO("Not yet implemented")
     }
 
-    override fun getNoteById(id: String): Observable<Note> {
+    override fun getNoteById(id: String): Observable<StickyNote> {
         TODO()
     }
 
-    override fun putNote(note: Note) {
+    override fun putNote(note: StickyNote) {
         notesMap[note.id] = note
         noteSubject.onNext(notesMap.elements().toList())
     }
 
-    override fun createNote(note: Note) {
+    override fun createNote(note: StickyNote) {
         TODO()
     }
 

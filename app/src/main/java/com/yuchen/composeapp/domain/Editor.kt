@@ -1,51 +1,42 @@
 package com.yuchen.composeapp.domain
 
 import com.yuchen.composeapp.data.NoteRepository
-import com.yuchen.composeapp.model.Note
+import com.yuchen.composeapp.model.StickyNote
 import com.yuchen.composeapp.model.Position
 import com.yuchen.composeapp.model.YCColor
-import com.yuchen.composeapp.ui.state.EditorScreenState
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Optional
 
 class Editor(private val noteRepository: NoteRepository) {
-    //    val allVisibleNotes: Observable<List<String>>
-//    val selectedNote: Observable<Optional<Note>>
     private val selectingNoteId = BehaviorSubject.createDefault(Optional.empty<String>())
     private val _openEditTextScreenSignal = PublishSubject.create<Unit>()
+    private val _showContextMenu = BehaviorSubject.createDefault(false)
+    private val _showAddButton = BehaviorSubject.createDefault(true)
 
-    val editorScreenState: Observable<EditorScreenState>
-        get() = Observables.combineLatest(
-            noteRepository.getAllNotes(),
-            selectingNoteId
-        ) { notes, optionalId ->
-            val selectedNote = optionalId.flatMap { id ->
-                Optional.ofNullable(notes.find { note -> note.id == id })
-            }
-            EditorScreenState(notes.toMutableList(), selectedNote)
-        }.replay(1).autoConnect()
-
-    val showContextMenu: Observable<Boolean> = BehaviorSubject.createDefault(false)
-    val showAdderButton: Observable<Boolean> = BehaviorSubject.createDefault(false)
-
-    val openEditTextScreen: Observable<Note> = _openEditTextScreenSignal
-        .withLatestFrom(editorScreenState) { _, state -> state.selectedNote }
-        .mapOptional { it }
-
-    val contextMenu: ContextMenu = ContextMenu(
-        editorScreenState.map { state ->
-            if (state.selectedNote.isPresent) {
-                Optional.ofNullable(state.selectedNote.get())
+    val selectedNote: Observable<Optional<StickyNote>> = selectingNoteId
+        .switchMap { optId ->
+            if (optId.isPresent) {
+                noteRepository.getNoteById(optId.get())
+                    .map { Optional.ofNullable(it) }
             } else {
-                Optional.empty()
+                Observable.just(Optional.empty())
             }
         }
-    )
+
+    val allVisibleNoteIds: Observable<List<String>> = noteRepository.getAllVisibleNoteIds()
+    val showContextMenu: Observable<Boolean> = _showContextMenu.hide()
+    val showAddButton: Observable<Boolean> = _showAddButton.hide()
+
+    val openEditTextScreen: Observable<StickyNote> = _openEditTextScreenSignal
+        .withLatestFrom(selectedNote) { _, optNote ->
+            optNote
+        }.mapOptional { it }
+
+    val contextMenu: ContextMenu = ContextMenu(selectedNote)
 
     private val disposableBag = CompositeDisposable()
 
@@ -54,15 +45,23 @@ class Editor(private val noteRepository: NoteRepository) {
             clearSelection()
         } else {
             selectingNoteId.onNext(Optional.of(noteId))
+            _showContextMenu.onNext(true)
+            _showAddButton.onNext(false)
         }
     }
 
     fun clearSelection() {
         selectingNoteId.onNext(Optional.empty())
+        _showContextMenu.onNext(false)
+        _showAddButton.onNext(true)
+    }
+
+    fun getNoteById(id: String): Observable<StickyNote> {
+        return noteRepository.getNoteById(id)
     }
 
     fun addNote() {
-        val newNote = Note.createRandomNote()
+        val newNote = StickyNote.createRandomNote()
         noteRepository.createNote(newNote)
     }
 
@@ -83,8 +82,8 @@ class Editor(private val noteRepository: NoteRepository) {
 
     private fun changeColor(color: YCColor) {
         Observable.just(color)
-            .withLatestFrom(editorScreenState) { newColor, state ->
-                state.selectedNote.map { note ->
+            .withLatestFrom(selectedNote) { newColor, optSelectedNote ->
+                optSelectedNote.map { note ->
                     note.copy(color = newColor)
                 }
             }.mapOptional { it }
